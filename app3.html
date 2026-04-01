@@ -1,0 +1,2746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --md-primary: #6750A4;
+      --md-primary-container: #EADDFF;
+      --md-on-primary: #FFFFFF;
+      --md-secondary: #625B71;
+      --md-secondary-container: #E8DEF8;
+      --md-surface: #FFFBFE;
+      --md-surface-variant: #E7E0EC;
+      --md-on-surface: #1C1B1F;
+      --md-on-surface-variant: #49454F;
+      --md-outline: #79747E;
+      --md-error: #B3261E;
+      --md-success: #386A20;
+      --md-warning: #7D5700;
+      --md-background: #FFFBFE;
+      --md-shadow: rgba(0, 0, 0, 0.12);
+      --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+      --md-elevation-2: 0 3px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.12);
+      --md-elevation-3: 0 10px 20px rgba(0,0,0,0.10), 0 6px 6px rgba(0,0,0,0.11);
+      --md-radius-sm: 8px;
+      --md-radius-md: 16px;
+      --md-radius-lg: 24px;
+      --md-radius-xl: 28px;
+      --md-radius-full: 9999px;
+      --md-display: 700 3.5rem/1.1 'Inter', sans-serif;
+      --md-headline-lg: 600 2rem/1.2 'Inter', sans-serif;
+      --md-headline-md: 600 1.75rem/1.2 'Inter', sans-serif;
+      --md-title-lg: 600 1.375rem/1.3 'Inter', sans-serif;
+      --md-title-md: 500 1rem/1.5 'Inter', sans-serif;
+      --md-body-lg: 400 1rem/1.6 'Inter', sans-serif;
+      --md-body-md: 400 0.875rem/1.5 'Inter', sans-serif;
+      --md-label: 500 0.75rem/1.4 'Inter', sans-serif;
+      --app-gradient: radial-gradient(circle at top left, color-mix(in srgb, var(--md-primary) 20%, transparent), transparent 35%),
+        radial-gradient(circle at top right, color-mix(in srgb, var(--md-secondary) 18%, transparent), transparent 28%),
+        linear-gradient(180deg, color-mix(in srgb, var(--md-primary-container) 55%, var(--md-background)) 0%, var(--md-background) 48%, color-mix(in srgb, var(--md-secondary-container) 35%, var(--md-background)) 100%);
+    }
+
+    [data-theme="dark"] {
+      --md-primary: #D0BCFF;
+      --md-primary-container: #4F378B;
+      --md-on-primary: #381E72;
+      --md-secondary: #CCC2DC;
+      --md-secondary-container: #4A4458;
+      --md-surface: #1C1B1F;
+      --md-surface-variant: #49454F;
+      --md-on-surface: #E6E1E5;
+      --md-on-surface-variant: #CAC4D0;
+      --md-outline: #938F99;
+      --md-background: #1C1B1F;
+      --md-shadow: rgba(0, 0, 0, 0.3);
+      --app-gradient: radial-gradient(circle at top left, color-mix(in srgb, var(--md-primary) 15%, transparent), transparent 35%),
+        radial-gradient(circle at bottom right, color-mix(in srgb, var(--md-secondary) 20%, transparent), transparent 32%),
+        linear-gradient(180deg, #16151a 0%, #1c1b1f 50%, #221f28 100%);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--md-background);
+      color: var(--md-on-surface);
+    }
+    body {
+      background-image: var(--app-gradient);
+      overflow-x: hidden;
+    }
+    body.reduce-motion * {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+    :focus-visible {
+      outline: 3px solid var(--md-primary);
+      outline-offset: 3px;
+    }
+    .app-shell { min-height: 100vh; position: relative; }
+    .sidebar {
+      display: none;
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 260px;
+      padding: 28px 18px;
+      background: color-mix(in srgb, var(--md-surface) 84%, transparent);
+      backdrop-filter: blur(24px);
+      border-right: 1px solid color-mix(in srgb, var(--md-outline) 24%, transparent);
+      z-index: 30;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 16px;
+      border-radius: var(--md-radius-xl);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--md-primary-container) 88%, transparent), color-mix(in srgb, var(--md-secondary-container) 72%, transparent));
+      box-shadow: var(--md-elevation-2);
+      margin-bottom: 28px;
+    }
+    .sidebar-logo-mark {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, white 20%, transparent);
+    }
+    .sidebar-logo h1 { font: var(--md-title-lg); margin: 0; }
+    .sidebar-logo p { margin: 4px 0 0; color: var(--md-on-surface-variant); font: var(--md-body-md); }
+    .nav-stack { display: grid; gap: 8px; }
+    .side-nav-item,
+    .bottom-nav-item {
+      border: 0;
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .side-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 0 999px 999px 0;
+      font: var(--md-title-md);
+      width: 100%;
+      text-align: left;
+      transition: color 0.2s ease;
+    }
+    .side-nav-item.active { background: var(--md-secondary-container); color: var(--md-on-surface); }
+    .sidebar-footer {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 24px;
+      display: grid;
+      gap: 14px;
+    }
+    .sidebar-theme-row,
+    .profile-card {
+      background: color-mix(in srgb, var(--md-surface) 90%, transparent);
+      border-radius: var(--md-radius-lg);
+      padding: 14px 16px;
+      box-shadow: var(--md-elevation-1);
+    }
+    .profile-card { display: flex; align-items: center; gap: 12px; }
+    .profile-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--md-primary), color-mix(in srgb, var(--md-secondary) 55%, var(--md-primary)));
+      color: #fff;
+      font-weight: 700;
+    }
+    .app-main {
+      padding: 24px 18px 112px;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+    .app-main.desktop {
+      margin-left: 260px;
+      padding: 28px 28px 28px;
+    }
+    .view { display: none; animation: fadeIn 0.25s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .page-title { margin: 0; font: var(--md-headline-md); letter-spacing: -0.04em; }
+    .page-subtitle { margin: 8px 0 0; color: var(--md-on-surface-variant); font: var(--md-body-md); }
+    [data-theme="dark"] .small.text-secondary-emphasis {
+      color: rgba(255, 255, 255, 0.88) !important;
+    }
+    .glass-card,
+    .stat-card,
+    .task-card,
+    .settings-card,
+    .sound-card {
+      background: color-mix(in srgb, var(--md-surface) 91%, transparent);
+      border: 1px solid color-mix(in srgb, var(--md-outline) 14%, transparent);
+      border-radius: var(--md-radius-xl);
+      box-shadow: var(--md-elevation-2);
+      backdrop-filter: blur(18px);
+    }
+    .glass-card { padding: 20px; }
+    .timer-layout { display: grid; gap: 20px; align-items: start; }
+    .timer-stage {
+      min-height: calc(100vh - 200px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+    .timer-stage::before {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--md-primary) 14%, transparent), transparent 62%);
+      filter: blur(30px);
+      z-index: 0;
+    }
+    .session-tabs {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .session-tab,
+    .chip,
+    .segmented-btn,
+    .priority-chip,
+    .sound-toggle {
+      border: 0;
+      border-radius: var(--md-radius-full);
+      background: color-mix(in srgb, var(--md-surface-variant) 75%, transparent);
+      color: var(--md-on-surface-variant);
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .session-tab.active,
+    .chip.active,
+    .segmented-btn.active,
+    .priority-chip.active,
+    .sound-toggle.active {
+      background: var(--md-primary-container);
+      color: var(--md-on-surface);
+    }
+    .active-task-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: color-mix(in srgb, var(--md-secondary-container) 82%, transparent);
+      padding: 12px 16px;
+      border-radius: var(--md-radius-full);
+      margin-bottom: 18px;
+      max-width: min(100%, 320px);
+      color: var(--md-on-surface);
+    }
+    .active-task-chip .material-icons-round { font-size: 18px; }
+    .timer-ring-wrap {
+      width: min(300px, 78vw);
+      height: min(300px, 78vw);
+      margin: 0 auto;
+      position: relative;
+      display: grid;
+      place-items: center;
+      z-index: 1;
+    }
+    .timer-ring-wrap svg { width: 100%; height: 100%; overflow: visible; }
+    .timer-ring-track { stroke: color-mix(in srgb, var(--md-primary) 18%, transparent); opacity: 0.25; }
+    .timer-ring-progress { stroke: var(--md-primary); stroke-linecap: round; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    .timer-core {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 52px;
+    }
+    .timer-countdown {
+      font: var(--md-display);
+      letter-spacing: -0.05em;
+      margin: 0;
+      font-size: clamp(2.6rem, 10vw, 4.1rem);
+    }
+    .timer-label {
+      margin-top: 10px;
+      color: var(--md-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font: var(--md-label);
+    }
+    .timer-dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+    .timer-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--md-outline) 40%, transparent);
+    }
+    .timer-dots span.active {
+      background: var(--md-primary);
+      box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 16%, transparent);
+    }
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin: 24px 0 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .icon-btn,
+    .fab,
+    .mini-fab {
+      border: 0;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease;
+    }
+    .icon-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--md-surface) 92%, transparent);
+      color: var(--md-on-surface);
+      box-shadow: var(--md-elevation-1);
+    }
+    .fab {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--md-radius-lg);
+      background: var(--md-primary-container);
+      color: var(--md-primary);
+      box-shadow: var(--md-elevation-3);
+      position: fixed;
+      bottom: 96px;
+      right: 20px;
+      z-index: 20;
+    }
+    .fab-large {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+    }
+    .fab-label {
+      position: absolute;
+      right: calc(100% + 12px);
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: var(--md-radius-full);
+      background: color-mix(in srgb, var(--md-surface) 92%, transparent);
+      color: var(--md-on-surface);
+      box-shadow: var(--md-elevation-1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      font: var(--md-body-md);
+    }
+    .fab:hover .fab-label { opacity: 1; }
+    .quote-box {
+      min-height: 82px;
+      max-width: 620px;
+      margin-inline: auto;
+      color: var(--md-on-surface);
+      font: 500 clamp(1rem, 2.2vw, 1.2rem)/1.7 'Inter', sans-serif;
+      position: relative;
+      z-index: 1;
+    }
+    .quote-author { display: block; margin-top: 8px; color: var(--md-on-surface-variant); font: var(--md-body-md); }
+    .ambient-panel { display: grid; gap: 14px; margin-top: 18px; position: relative; z-index: 1; }
+    .ambient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .sound-card { padding: 14px; display: grid; gap: 12px; }
+    .sound-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .sound-title { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .sound-emoji { font-size: 1.2rem; }
+    .slider,
+    input[type="range"] { width: 100%; accent-color: var(--md-primary); }
+    .search-shell { display: grid; gap: 16px; margin-bottom: 16px; }
+    .md-field {
+      position: relative;
+      border: 2px solid var(--md-outline);
+      border-radius: var(--md-radius-sm);
+      padding: 16px 14px 8px;
+      background: color-mix(in srgb, var(--md-surface) 95%, transparent);
+      transition: border-color 0.2s ease;
+    }
+    .md-field:focus-within { border-color: var(--md-primary); }
+    .md-field label {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      transform: translateY(-50%);
+      transition: all 0.2s ease;
+      color: var(--md-on-surface-variant);
+      pointer-events: none;
+      background: transparent;
+    }
+    .md-field.has-value label,
+    .md-field:focus-within label {
+      top: 0;
+      transform: translateY(-50%) scale(0.75);
+      color: var(--md-primary);
+      background: var(--md-surface);
+      padding: 0 4px;
+    }
+    .md-field input,
+    .md-field textarea,
+    .md-field select {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--md-on-surface);
+      padding: 0;
+      outline: none;
+      resize: vertical;
+    }
+    .chips-row,
+    .segmented-row,
+    .filter-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tasks-grid { display: grid; gap: 14px; padding-bottom: 88px; }
+    .task-card {
+      position: relative;
+      padding: 18px;
+      overflow: hidden;
+      touch-action: pan-y;
+      color: #ffffff;
+    }
+    .task-card-inner { position: relative; z-index: 2; }
+    .task-delete-zone {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #9b1c1c, #d13b3b);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 20px;
+      color: #fff;
+      font-weight: 600;
+      z-index: 1;
+    }
+    .task-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .task-main { display: flex; align-items: flex-start; gap: 12px; flex: 1; }
+    .priority-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 8px; flex-shrink: 0; }
+    .task-title-wrap { flex: 1; min-width: 0; position: relative; }
+    .task-title { margin: 0; font: var(--md-title-md); color: #ffffff; }
+    .task-desc { margin: 8px 0 0; color: rgba(255, 255, 255, 0.88); font: var(--md-body-md); }
+    .task-strike {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 12px;
+      height: 2px;
+      transform-origin: left center;
+      background: var(--md-on-surface);
+      scale: 0 1;
+      opacity: 0.7;
+    }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .tag-chip,
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--md-radius-full);
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 8px 12px;
+      font: var(--md-label);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .task-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .subtask-bar {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .subtask-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--md-primary), color-mix(in srgb, var(--md-secondary) 50%, var(--md-primary)));
+    }
+    .checkbox-btn,
+    .menu-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 0;
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .task-card .small.text-secondary-emphasis {
+      color: rgba(255, 255, 255, 0.88) !important;
+    }
+    .empty-state { padding: 54px 20px; text-align: center; }
+    .empty-illustration { width: min(260px, 70vw); margin: 0 auto 24px; display: block; }
+    .stats-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin-bottom: 18px;
+    }
+    .stat-card { padding: 18px; display: grid; gap: 8px; }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--md-primary-container) 75%, transparent);
+      color: var(--md-primary);
+    }
+    .stat-value {
+      font: 700 clamp(1.8rem, 5vw, 2.3rem)/1 'Inter', sans-serif;
+      letter-spacing: -0.04em;
+      margin: 4px 0 0;
+    }
+    .stats-layout { display: grid; gap: 16px; }
+    .chart-card,
+    .heatmap-card,
+    .score-card,
+    .tag-card { padding: 20px; }
+    .chart-wrap { position: relative; height: 280px; }
+    #focus-chart { width: 100%; height: 100%; display: block; }
+    .chart-tooltip,
+    .heatmap-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: color-mix(in srgb, var(--md-surface) 94%, transparent);
+      color: var(--md-on-surface);
+      border-radius: 14px;
+      box-shadow: var(--md-elevation-2);
+      padding: 10px 12px;
+      font: var(--md-body-md);
+      opacity: 0;
+      transform: translate(-50%, -120%);
+      z-index: 5;
+    }
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(16px, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: var(--md-surface-variant);
+      position: relative;
+      cursor: pointer;
+    }
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--md-on-surface-variant);
+      font: var(--md-label);
+    }
+    .legend-box { width: 14px; height: 14px; border-radius: 4px; }
+    .score-layout { display: grid; gap: 18px; align-items: center; }
+    .score-ring {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    .score-ring svg { width: 100%; height: 100%; }
+    .score-center { position: absolute; text-align: center; }
+    .score-center strong {
+      display: block;
+      font-size: 2.6rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .tag-list { display: grid; gap: 14px; }
+    .tag-row { display: grid; gap: 8px; }
+    .tag-bar {
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--md-outline) 22%, transparent);
+    }
+    .tag-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--md-primary), color-mix(in srgb, var(--md-secondary) 55%, var(--md-primary)));
+    }
+    .settings-layout { display: grid; gap: 14px; }
+    .settings-card { padding: 20px; display: grid; gap: 16px; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font: var(--md-title-lg);
+    }
+    .section-subtitle { margin: -4px 0 0; color: var(--md-on-surface-variant); font: var(--md-body-md); }
+    .settings-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--md-outline) 16%, transparent);
+    }
+    .setting-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .switch {
+      width: 54px;
+      height: 32px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--md-outline) 35%, transparent);
+      position: relative;
+      border: 0;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--md-surface);
+      transition: transform 0.2s ease;
+      box-shadow: var(--md-elevation-1);
+    }
+    .switch.active { background: var(--md-primary); }
+    .switch.active::after { transform: translateX(22px); }
+    .accent-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .accent-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-1);
+    }
+    .accent-swatch.active {
+      border-color: color-mix(in srgb, var(--md-on-surface) 70%, transparent);
+      transform: scale(1.06);
+    }
+    .bottom-nav {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 80px;
+      background: color-mix(in srgb, var(--md-surface) 88%, transparent);
+      border: 1px solid color-mix(in srgb, var(--md-outline) 18%, transparent);
+      border-radius: 28px;
+      box-shadow: var(--md-elevation-3);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 40;
+    }
+    .bottom-nav-indicator {
+      position: absolute;
+      top: 8px;
+      width: 64px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--md-secondary-container);
+      z-index: 0;
+      left: 0;
+      transform: translateX(0);
+    }
+    .bottom-nav-item {
+      width: 72px;
+      height: 64px;
+      border-radius: 20px;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 2px;
+      font: var(--md-label);
+      z-index: 1;
+    }
+    .bottom-nav-item.active { color: var(--md-on-surface); }
+    .bottom-nav-item .material-icons-round { font-size: 24px; line-height: 1; }
+    #curtain,
+    #theme-wipe {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+    }
+    #curtain {
+      background: radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--md-primary) 32%, var(--md-background)), color-mix(in srgb, var(--md-secondary) 24%, var(--md-background)));
+      clip-path: circle(0% at 50% 100%);
+    }
+    #theme-wipe svg { width: 100%; height: 100%; }
+    .particle-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      overflow: visible;
+    }
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+    }
+    .ripple {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: color-mix(in srgb, white 45%, transparent);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+    .swal2-popup.md-popup,
+    .swal2-popup.md-toast {
+      border-radius: var(--md-radius-xl);
+      box-shadow: var(--md-elevation-3);
+    }
+    .swal2-popup.md-popup { padding: 1.25rem; }
+    .task-form {
+      display: grid;
+      gap: 14px;
+      text-align: left;
+      margin-top: 6px;
+    }
+    .tags-builder,
+    .subtask-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .removable-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--md-primary-container) 80%, transparent);
+      font: var(--md-label);
+    }
+    .removable-chip button {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      display: inline-flex;
+      padding: 0;
+      cursor: pointer;
+    }
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--md-surface-variant) 70%, transparent);
+      padding: 6px;
+    }
+    .stepper button {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--md-surface);
+      color: var(--md-on-surface);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    .hidden { display: none !important; }
+    @media (min-width: 600px) {
+      .timer-layout { grid-template-columns: 1.5fr 1fr; }
+      .score-layout { grid-template-columns: 220px 1fr; }
+    }
+    @media (min-width: 900px) {
+      .sidebar { display: block; }
+      .bottom-nav, .mobile-only { display: none !important; }
+      .fab { right: 28px; bottom: 28px; }
+    }
+    @media (max-width: 899px) {
+      .desktop-only { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Desktop sidebar navigation">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">
+          <span class="material-icons-round" aria-hidden="true">bolt</span>
+        </div>
+        <div>
+          <h1>FocusFlow</h1>
+          <p>Flow state, on demand.</p>
+        </div>
+      </div>
+      <nav class="nav-stack" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-theme-row">
+          <div class="d-flex align-items-center justify-content-between gap-3">
+            <div>
+              <div class="fw-semibold">Theme mode</div>
+              <div class="small text-secondary-emphasis">Light, dark, or system</div>
+            </div>
+            <button class="icon-btn" id="sidebar-theme-toggle" aria-label="Cycle theme">
+              <span class="material-icons-round" aria-hidden="true">contrast</span>
+            </button>
+          </div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-badge" aria-hidden="true">FF</div>
+          <div>
+            <div class="fw-semibold">Deep Work Mode</div>
+            <div class="small text-secondary-emphasis">Single-file productivity suite</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div id="curtain" aria-hidden="true"></div>
+    <div id="theme-wipe" aria-hidden="true">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <radialGradient id="wipeGradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--md-primary)"></stop>
+            <stop offset="100%" stop-color="transparent"></stop>
+          </radialGradient>
+        </defs>
+        <circle id="theme-wipe-circle" cx="-20" cy="50" r="18" fill="url(#wipeGradient)"></circle>
+      </svg>
+    </div>
+    <main class="app-main" id="app">
+      <div id="live-region" class="sr-only" aria-live="polite"></div>
+      <section class="view active" id="view-timer" data-view="timer"></section>
+      <section class="view" id="view-tasks" data-view="tasks"></section>
+      <section class="view" id="view-stats" data-view="stats"></section>
+      <section class="view" id="view-settings" data-view="settings"></section>
+    </main>
+    <nav class="bottom-nav" aria-label="Bottom navigation">
+      <div class="bottom-nav-indicator" id="bottom-nav-indicator"></div>
+      <button class="bottom-nav-item" data-view-target="timer" aria-label="Focus Timer">
+        <span class="material-icons-round" aria-hidden="true">timer</span>
+        <span>Timer</span>
+      </button>
+      <button class="bottom-nav-item" data-view-target="tasks" aria-label="Task Board">
+        <span class="material-icons-round" aria-hidden="true">checklist</span>
+        <span>Tasks</span>
+      </button>
+      <button class="bottom-nav-item" data-view-target="stats" aria-label="Analytics">
+        <span class="material-icons-round" aria-hidden="true">insights</span>
+        <span>Stats</span>
+      </button>
+      <button class="bottom-nav-item" data-view-target="settings" aria-label="Settings">
+        <span class="material-icons-round" aria-hidden="true">tune</span>
+        <span>Settings</span>
+      </button>
+    </nav>
+    <button class="fab hidden" id="tasks-fab" aria-label="Add task">
+      <span class="fab-label">Add task</span>
+      <span class="material-icons-round" aria-hidden="true">add</span>
+    </button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+  <script>
+    (() => {
+      if (window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+      const STORAGE_KEYS = {
+        tasks: 'focusflow_tasks',
+        sessions: 'focusflow_sessions',
+        settings: 'focusflow_settings',
+        state: 'focusflow_state'
+      };
+      const NAV_ITEMS = [
+        { id: 'timer', label: 'Focus Timer', short: 'Timer', icon: 'timer' },
+        { id: 'tasks', label: 'Task Board', short: 'Tasks', icon: 'checklist' },
+        { id: 'stats', label: 'Analytics', short: 'Stats', icon: 'insights' },
+        { id: 'settings', label: 'Settings', short: 'Settings', icon: 'tune' }
+      ];
+      const PRIORITY_META = {
+        low: { label: 'Low', color: '#386A20' },
+        medium: { label: 'Medium', color: '#7D5700' },
+        high: { label: 'High', color: '#E97E0F' },
+        critical: { label: 'Critical', color: '#B3261E' }
+      };
+      const SOUND_META = [
+        { key: 'rain', label: 'Rain', emoji: '🌧' },
+        { key: 'ocean', label: 'Ocean', emoji: '🌊' },
+        { key: 'cafe', label: 'Cafe', emoji: '☕' },
+        { key: 'forest', label: 'Forest', emoji: '🌲' },
+        { key: 'fire', label: 'Fire', emoji: '🔥' }
+      ];
+      const QUOTES = [
+        'Attention is the rarest and purest form of generosity.',
+        'Great things are built in the quiet cadence of focused minutes.',
+        'Your future self is shaped by what you protect your attention from today.',
+        'Deep work is how small effort starts feeling like momentum.',
+        'One calm session can reset the trajectory of an entire day.',
+        'Progress loves consistency more than intensity.',
+        'Focus is not force. It is choosing what deserves your full presence.',
+        'Tiny blocks of intention become towering stacks of output.',
+        'The task in front of you is enough. Finish this slice first.',
+        'Momentum grows when you keep the promise of a single session.',
+        'Protected time is a creative superpower.',
+        'Clarity arrives after the first few undistracted minutes.'
+      ];
+      const ACCENT_COLORS = ['#6750A4', '#00639B', '#386A20', '#B3261E', '#7D5700', '#7D5260'];
+      const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (REDUCED_MOTION) document.body.classList.add('reduce-motion');
+
+      const DEFAULT_SETTINGS = {
+        durations: { focus: 25, shortBreak: 5, longBreak: 15, cyclesBeforeLong: 4 },
+        theme: 'system',
+        notifications: { browser: false, sound: true, autoStartBreaks: true },
+        audio: { masterVolume: 0.7 },
+        accentColor: '#6750A4',
+        version: '1.0.0'
+      };
+      const DEFAULT_STATE = {
+        currentSession: 'focus',
+        remainingSeconds: DEFAULT_SETTINGS.durations.focus * 60,
+        pomodoroCount: 0,
+        activeTaskId: null,
+        isRunning: false,
+        selectedView: 'timer',
+        statsRange: 'week',
+        taskFilter: 'all',
+        taskSearch: '',
+        soundStates: {
+          rain: { enabled: false, volume: 0.4 },
+          ocean: { enabled: false, volume: 0.35 },
+          cafe: { enabled: false, volume: 0.25 },
+          forest: { enabled: false, volume: 0.3 },
+          fire: { enabled: false, volume: 0.3 }
+        }
+      };
+
+      const chartState = { bars: [] };
+      const uiState = {
+        timerInterval: null,
+        glowTimeline: null,
+        autoAdvanceTimeout: null,
+        chartCanvas: null,
+        chartTooltip: null,
+        heatmapTooltip: null
+      };
+
+      let settings = null;
+      let state = null;
+      let tasks = [];
+      let sessions = [];
+      let themeMedia = null;
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: 'var(--md-surface)',
+        color: 'var(--md-on-surface)',
+        iconColor: 'var(--md-primary)',
+        customClass: { popup: 'md-toast' }
+      });
+
+      function randomId() {
+        return (crypto && crypto.randomUUID) ? crypto.randomUUID() : `ff-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+      function getStore(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (error) {
+          console.warn(`Failed to parse ${key}`, error);
+          return fallback;
+        }
+      }
+      function setStore(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+      function updateStore(key, fn) {
+        const current = getStore(key, null);
+        const next = fn(current);
+        setStore(key, next);
+        return next;
+      }
+      function debouncedSave(key, value, delay = 300) {
+        debouncedSave.timers = debouncedSave.timers || {};
+        clearTimeout(debouncedSave.timers[key]);
+        debouncedSave.timers[key] = setTimeout(() => setStore(key, value), delay);
+      }
+
+      function makeSeedTasks() {
+        const now = Date.now();
+        return [
+          {
+            id: randomId(),
+            title: 'Design onboarding flow',
+            description: 'Wireframe 3 screens for new user onboarding',
+            priority: 'high',
+            tags: ['design', 'ux'],
+            dueDate: new Date(now + 86400000).toISOString(),
+            subtasks: [
+              { id: randomId(), text: 'Research competitor flows', done: true },
+              { id: randomId(), text: 'Sketch wireframes', done: false },
+              { id: randomId(), text: 'Create Figma prototype', done: false }
+            ],
+            completedAt: null,
+            pomodorosEstimated: 4,
+            pomodorosUsed: 1,
+            createdAt: new Date(now - 3600000).toISOString()
+          },
+          {
+            id: randomId(),
+            title: 'Prepare sprint review deck',
+            description: 'Capture outcomes, metrics, and standout demos for Friday review.',
+            priority: 'medium',
+            tags: ['ops', 'presentation'],
+            dueDate: new Date(now + 2 * 86400000).toISOString(),
+            subtasks: [
+              { id: randomId(), text: 'Collect highlights from engineering', done: true },
+              { id: randomId(), text: 'Summarize KPI slide', done: true },
+              { id: randomId(), text: 'Polish final transitions', done: false }
+            ],
+            completedAt: null,
+            pomodorosEstimated: 3,
+            pomodorosUsed: 2,
+            createdAt: new Date(now - 2 * 86400000).toISOString()
+          },
+          {
+            id: randomId(),
+            title: 'Refactor notification preferences',
+            description: 'Reduce settings complexity and align toggles with the new product language.',
+            priority: 'critical',
+            tags: ['frontend', 'product'],
+            dueDate: new Date(now + 4 * 86400000).toISOString(),
+            subtasks: [
+              { id: randomId(), text: 'Audit current toggles', done: true },
+              { id: randomId(), text: 'Simplify copy and hierarchy', done: false },
+              { id: randomId(), text: 'Document edge cases', done: false }
+            ],
+            completedAt: null,
+            pomodorosEstimated: 5,
+            pomodorosUsed: 0,
+            createdAt: new Date(now - 4 * 86400000).toISOString()
+          }
+        ];
+      }
+
+      function makeSeedSessions() {
+        const base = [
+          { pomodoros: 5, focusMinutes: 125, tasksCompleted: 2 },
+          { pomodoros: 7, focusMinutes: 175, tasksCompleted: 3 },
+          { pomodoros: 4, focusMinutes: 100, tasksCompleted: 1 },
+          { pomodoros: 6, focusMinutes: 150, tasksCompleted: 2 },
+          { pomodoros: 3, focusMinutes: 75, tasksCompleted: 1 },
+          { pomodoros: 8, focusMinutes: 200, tasksCompleted: 4 },
+          { pomodoros: 5, focusMinutes: 125, tasksCompleted: 2 }
+        ];
+        return Array.from({ length: 7 }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          return { date: date.toISOString().split('T')[0], ...base[i] };
+        }).reverse();
+      }
+
+      function seedIfNeeded() {
+        if (!localStorage.getItem(STORAGE_KEYS.tasks)) setStore(STORAGE_KEYS.tasks, makeSeedTasks());
+        if (!localStorage.getItem(STORAGE_KEYS.sessions)) setStore(STORAGE_KEYS.sessions, makeSeedSessions());
+        if (!localStorage.getItem(STORAGE_KEYS.settings)) setStore(STORAGE_KEYS.settings, DEFAULT_SETTINGS);
+        if (!localStorage.getItem(STORAGE_KEYS.state)) setStore(STORAGE_KEYS.state, DEFAULT_STATE);
+      }
+
+      function loadData() {
+        settings = { ...DEFAULT_SETTINGS, ...getStore(STORAGE_KEYS.settings, DEFAULT_SETTINGS) };
+        settings.durations = { ...DEFAULT_SETTINGS.durations, ...(settings.durations || {}) };
+        settings.notifications = { ...DEFAULT_SETTINGS.notifications, ...(settings.notifications || {}) };
+        settings.audio = { ...DEFAULT_SETTINGS.audio, ...(settings.audio || {}) };
+        state = { ...DEFAULT_STATE, ...getStore(STORAGE_KEYS.state, DEFAULT_STATE) };
+        state.soundStates = { ...DEFAULT_STATE.soundStates, ...(state.soundStates || {}) };
+        tasks = getStore(STORAGE_KEYS.tasks, makeSeedTasks());
+        sessions = getStore(STORAGE_KEYS.sessions, makeSeedSessions());
+        ensureRemainingMatchesSession();
+      }
+
+      function saveState() { debouncedSave(STORAGE_KEYS.state, state); }
+      function saveTasks() { debouncedSave(STORAGE_KEYS.tasks, tasks); }
+      function saveSessions() { debouncedSave(STORAGE_KEYS.sessions, sessions); }
+      function saveSettings() { debouncedSave(STORAGE_KEYS.settings, settings); }
+
+      function sessionSeconds(sessionType = state.currentSession) {
+        const map = {
+          focus: settings.durations.focus,
+          shortBreak: settings.durations.shortBreak,
+          longBreak: settings.durations.longBreak
+        };
+        return (map[sessionType] || settings.durations.focus) * 60;
+      }
+      function ensureRemainingMatchesSession() {
+        const max = sessionSeconds(state.currentSession);
+        if (!Number.isFinite(state.remainingSeconds) || state.remainingSeconds <= 0 || state.remainingSeconds > max) {
+          state.remainingSeconds = max;
+        }
+      }
+      function formatTime(totalSeconds) {
+        const mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const secs = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+        return `${mins}:${secs}`;
+      }
+      function sessionLabel(sessionType) {
+        return sessionType === 'focus' ? 'Focus' : sessionType === 'shortBreak' ? 'Short Break' : 'Long Break';
+      }
+      function todayKey() { return new Date().toISOString().split('T')[0]; }
+      function getSessionRecord(dateKey) {
+        let record = sessions.find((entry) => entry.date === dateKey);
+        if (!record) {
+          record = { date: dateKey, pomodoros: 0, focusMinutes: 0, tasksCompleted: 0 };
+          sessions.push(record);
+        }
+        return record;
+      }
+      function sortSessions() { sessions.sort((a, b) => a.date.localeCompare(b.date)); }
+      function getActiveTask() { return tasks.find((task) => task.id === state.activeTaskId) || null; }
+      function progressForTask(task) {
+        const total = task.subtasks.length || 1;
+        const done = task.subtasks.filter((subtask) => subtask.done).length;
+        return Math.round((done / total) * 100);
+      }
+      function hexToRgb(hex) {
+        const normalized = hex.replace('#', '');
+        const bigint = parseInt(normalized.length === 3 ? normalized.split('').map((c) => c + c).join('') : normalized, 16);
+        return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+      }
+      function mixColor(hexA, hexB, weight) {
+        const a = hexToRgb(hexA);
+        const b = hexToRgb(hexB);
+        const mix = (x, y) => Math.round(x * (1 - weight) + y * weight);
+        return `rgb(${mix(a.r, b.r)}, ${mix(a.g, b.g)}, ${mix(a.b, b.b)})`;
+      }
+      function applyTheme(withWipe = false) {
+        const resolved = settings.theme === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : settings.theme;
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.style.setProperty('--md-primary', settings.accentColor);
+        document.documentElement.style.setProperty('--md-primary-container', mixColor(settings.accentColor, resolved === 'dark' ? '#1C1B1F' : '#FFFFFF', resolved === 'dark' ? 0.3 : 0.78));
+        document.documentElement.style.setProperty('--md-secondary-container', mixColor(settings.accentColor, resolved === 'dark' ? '#4A4458' : '#E8DEF8', 0.34));
+        if (withWipe && !REDUCED_MOTION) animateThemeWipe();
+      }
+      function cycleTheme() {
+        const order = ['light', 'dark', 'system'];
+        const index = order.indexOf(settings.theme);
+        settings.theme = order[(index + 1) % order.length];
+        saveSettings();
+        applyTheme(true);
+        renderSettings();
+      }
+
+      function renderNav() {
+        const sidebarNav = document.getElementById('sidebar-nav');
+        sidebarNav.innerHTML = NAV_ITEMS.map((item) => `
+          <button class="side-nav-item ${state.selectedView === item.id ? 'active' : ''}" data-view-target="${item.id}" aria-label="${item.label}">
+            <span class="material-icons-round" aria-hidden="true">${item.icon}</span>
+            <span>${item.label}</span>
+          </button>
+        `).join('');
+        document.querySelectorAll('.bottom-nav-item').forEach((item) => {
+          item.classList.toggle('active', item.dataset.viewTarget === state.selectedView);
+        });
+        moveBottomIndicator();
+      }
+
+      function todayStats() {
+        return sessions.find((session) => session.date === todayKey()) || { pomodoros: 0, focusMinutes: 0, tasksCompleted: 0 };
+      }
+
+      function renderTimer() {
+        const view = document.getElementById('view-timer');
+        const activeTask = getActiveTask();
+        const currentQuote = QUOTES[state.pomodoroCount % QUOTES.length];
+        const currentSeconds = Math.max(0, state.remainingSeconds);
+        const totalSeconds = sessionSeconds(state.currentSession);
+        const radius = 126;
+        const circumference = 2 * Math.PI * radius;
+        const dashOffset = circumference * (1 - currentSeconds / totalSeconds);
+        const cycleDots = Array.from({ length: settings.durations.cyclesBeforeLong }, (_, index) => `<span class="${index < (state.pomodoroCount % settings.durations.cyclesBeforeLong) ? 'active' : ''}"></span>`).join('');
+        view.innerHTML = `
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Focus Timer</h2>
+              <p class="page-subtitle">Flow through focused sprints, immersive sound, and automatic recovery sessions.</p>
+            </div>
+            <div class="desktop-only text-end">
+              <div class="small text-secondary-emphasis">Current cadence</div>
+              <div class="fw-semibold">${settings.durations.focus}/${settings.durations.shortBreak}/${settings.durations.longBreak} min</div>
+            </div>
+          </div>
+          <div class="timer-layout">
+            <div class="glass-card timer-stage">
+              <div class="particle-layer" id="particle-layer"></div>
+              <div class="session-tabs" role="tablist" aria-label="Session type tabs">
+                ${[['focus', 'Focus'], ['shortBreak', 'Short Break'], ['longBreak', 'Long Break']].map(([key, label]) => `
+                  <button class="session-tab ${state.currentSession === key ? 'active' : ''}" data-session-tab="${key}" role="tab" aria-selected="${state.currentSession === key}">${label}</button>
+                `).join('')}
+              </div>
+              ${activeTask ? `
+                <div class="active-task-chip" title="${escapeHtml(activeTask.title)}">
+                  <span class="material-icons-round" aria-hidden="true">bolt</span>
+                  <span class="text-truncate">${escapeHtml(activeTask.title)}</span>
+                </div>` : ''}
+              <div class="timer-ring-wrap">
+                <svg viewBox="0 0 300 300" aria-hidden="true">
+                  <circle class="timer-ring-track" cx="150" cy="150" r="${radius}" stroke-width="18" fill="none"></circle>
+                  <circle class="timer-ring-progress" id="timer-ring" cx="150" cy="150" r="${radius}" stroke-width="18" fill="none"
+                    stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" transform="rotate(-90 150 150)"></circle>
+                </svg>
+                <div class="timer-core">
+                  <div>
+                    <p class="timer-countdown" id="timer-count">${formatTime(currentSeconds)}</p>
+                    <div class="timer-label">${sessionLabel(state.currentSession)}</div>
+                    <div class="timer-dots">${cycleDots}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="timer-controls">
+                <button class="icon-btn" id="skip-btn" aria-label="Skip session"><span class="material-icons-round" aria-hidden="true">skip_next</span></button>
+                <button class="fab fab-large" id="play-pause-btn" aria-label="${state.isRunning ? 'Pause timer' : 'Start timer'}"><span class="material-icons-round" aria-hidden="true">${state.isRunning ? 'pause' : 'play_arrow'}</span></button>
+                <button class="icon-btn" id="reset-btn" aria-label="Reset timer"><span class="material-icons-round" aria-hidden="true">replay</span></button>
+              </div>
+              <div class="quote-box" id="quote-box">
+                <span>${escapeHtml(currentQuote)}</span>
+                <span class="quote-author">FocusFlow motivation engine</span>
+              </div>
+            </div>
+            <div class="ambient-panel">
+              <div class="glass-card">
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">graphic_eq</span>Ambient Mixer</h3>
+                <p class="section-subtitle">Layer procedural soundscapes to hold the room in place while you work.</p>
+                <div class="ambient-grid">
+                  ${SOUND_META.map((sound) => {
+                    const soundState = state.soundStates[sound.key];
+                    return `
+                      <div class="sound-card">
+                        <div class="sound-top">
+                          <div class="sound-title"><span class="sound-emoji">${sound.emoji}</span> ${sound.label}</div>
+                          <button class="sound-toggle ${soundState.enabled ? 'active' : ''}" data-sound-toggle="${sound.key}" aria-label="Toggle ${sound.label}">
+                            <span class="material-icons-round" aria-hidden="true">${soundState.enabled ? 'volume_up' : 'volume_off'}</span>
+                          </button>
+                        </div>
+                        <input type="range" min="0" max="1" step="0.01" value="${soundState.volume}" data-sound-slider="${sound.key}" aria-label="${sound.label} volume">
+                      </div>`;
+                  }).join('')}
+                </div>
+              </div>
+              <div class="glass-card">
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">insights</span>Session Snapshot</h3>
+                <p class="section-subtitle">Today you have logged ${todayStats().pomodoros} pomodoros and ${todayStats().focusMinutes} focus minutes.</p>
+                <div class="chips-row">
+                  <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">local_fire_department</span>${computeStreak()} day streak</span>
+                  <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">check_circle</span>${tasks.filter((task) => task.completedAt).length} completed tasks</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        animateQuote();
+        syncTimerRingGlow();
+      }
+
+      function renderTaskCard(task) {
+        const progress = progressForTask(task);
+        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'No due date';
+        const priority = PRIORITY_META[task.priority] || PRIORITY_META.medium;
+        const isCompleted = Boolean(task.completedAt);
+        return `
+          <article class="task-card" data-task-id="${task.id}" aria-label="${escapeHtml(task.title)}">
+            <div class="task-delete-zone">
+              <span class="material-icons-round" aria-hidden="true">delete</span>
+              <span class="ms-2">Delete</span>
+            </div>
+            <div class="task-card-inner">
+              <div class="task-top">
+                <div class="task-main">
+                  <span class="priority-dot" style="background:${priority.color};"></span>
+                  <div class="task-title-wrap">
+                    <div class="task-strike"></div>
+                    <h3 class="task-title ${isCompleted ? 'text-decoration-line-through' : ''}">${escapeHtml(task.title)}</h3>
+                    <p class="task-desc">${escapeHtml(task.description || 'No description provided.')}</p>
+                    <div class="task-meta">
+                      ${task.tags.map((tag) => `<span class="tag-chip">#${escapeHtml(tag)}</span>`).join('')}
+                      <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">event</span>${dueDate}</span>
+                      <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">timer</span>${task.pomodorosUsed}/${task.pomodorosEstimated}</span>
+                      ${state.activeTaskId === task.id ? `<span class="meta-chip"><span class="material-icons-round" aria-hidden="true">bolt</span>Active</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  ${!isCompleted ? `<button class="checkbox-btn" data-task-complete="${task.id}" aria-label="Complete ${escapeHtml(task.title)}"><span class="material-icons-round" aria-hidden="true">check_box_outline_blank</span></button>` : ''}
+                  <button class="menu-btn" data-task-menu="${task.id}" aria-label="Task actions for ${escapeHtml(task.title)}"><span class="material-icons-round" aria-hidden="true">more_vert</span></button>
+                </div>
+              </div>
+              <div class="task-bottom">
+                <div class="subtask-bar" aria-label="Subtask completion"><span style="width:${progress}%"></span></div>
+                <div class="small text-secondary-emphasis">${progress}%</div>
+              </div>
+            </div>
+          </article>`;
+      }
+
+      function renderEmptyState() {
+        return `
+          <div class="glass-card empty-state">
+            <svg class="empty-illustration" viewBox="0 0 320 220" role="img" aria-label="Empty task state illustration">
+              <defs>
+                <linearGradient id="emptyGrad" x1="0%" x2="100%">
+                  <stop offset="0%" stop-color="var(--md-primary-container)"></stop>
+                  <stop offset="100%" stop-color="var(--md-secondary-container)"></stop>
+                </linearGradient>
+              </defs>
+              <rect x="48" y="32" width="224" height="150" rx="30" fill="url(#emptyGrad)"></rect>
+              <rect x="78" y="68" width="164" height="20" rx="10" fill="color-mix(in srgb, var(--md-surface) 90%, transparent)"></rect>
+              <rect x="78" y="102" width="124" height="16" rx="8" fill="color-mix(in srgb, var(--md-surface) 72%, transparent)"></rect>
+              <circle cx="232" cy="146" r="26" fill="var(--md-primary)"></circle>
+              <path d="M220 146l8 8 16-18" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            </svg>
+            <h3 class="page-title fs-3">All clear.</h3>
+            <p class="page-subtitle">Add your first task and choose one to drive your next focus session.</p>
+          </div>`;
+      }
+
+      function getFilteredTasks() {
+        const query = state.taskSearch.trim().toLowerCase();
+        return tasks
+          .filter((task) => {
+            const matchesSearch = !query || [task.title, task.description, ...(task.tags || [])].join(' ').toLowerCase().includes(query);
+            if (!matchesSearch) return false;
+            const due = task.dueDate ? task.dueDate.split('T')[0] : null;
+            const today = todayKey();
+            if (state.taskFilter === 'completed') return Boolean(task.completedAt);
+            if (task.completedAt) return false;
+            if (state.taskFilter === 'today') return due === today;
+            if (state.taskFilter === 'upcoming') return due && due > today;
+            return true;
+          })
+          .sort((a, b) => {
+            const aCompleted = a.completedAt ? 1 : 0;
+            const bCompleted = b.completedAt ? 1 : 0;
+            if (aCompleted !== bCompleted) return aCompleted - bCompleted;
+            return new Date(a.dueDate || a.createdAt) - new Date(b.dueDate || b.createdAt);
+          });
+      }
+
+      function renderTasks() {
+        const view = document.getElementById('view-tasks');
+        const filtered = getFilteredTasks();
+        view.innerHTML = `
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Task Board</h2>
+              <p class="page-subtitle">Organize work, pick the active task, and convert focus sessions into visible progress.</p>
+            </div>
+            <div class="desktop-only">
+              <button class="icon-btn" id="add-task-desktop" aria-label="Add task"><span class="material-icons-round" aria-hidden="true">add</span></button>
+            </div>
+          </div>
+          <div class="search-shell">
+            <div class="md-field ${state.taskSearch ? 'has-value' : ''}">
+              <label for="task-search">Search tasks</label>
+              <input id="task-search" type="text" value="${escapeAttribute(state.taskSearch)}" aria-label="Search tasks">
+            </div>
+            <div class="filter-row" role="tablist" aria-label="Task filters">
+              ${[['all', 'All'], ['today', 'Today'], ['upcoming', 'Upcoming'], ['completed', 'Completed']].map(([key, label]) => `
+                <button class="chip ${state.taskFilter === key ? 'active' : ''}" data-task-filter="${key}" role="tab" aria-selected="${state.taskFilter === key}">${label}</button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="tasks-grid" id="task-list">
+            ${filtered.length ? filtered.map(renderTaskCard).join('') : renderEmptyState()}
+          </div>`;
+        document.getElementById('tasks-fab').classList.toggle('hidden', state.selectedView !== 'tasks');
+        if (filtered.length && !REDUCED_MOTION) {
+          gsap.from('#task-list .task-card', {
+            rotateX: -90,
+            transformOrigin: 'top center',
+            opacity: 0,
+            duration: 0.5,
+            stagger: 0.07,
+            ease: 'back.out(1.5)'
+          });
+        }
+        attachSwipeHandlers();
+      }
+
+      function renderStatCard(icon, label, value, id) {
+        return `
+          <div class="stat-card">
+            <div class="stat-icon"><span class="material-icons-round" aria-hidden="true">${icon}</span></div>
+            <div class="small text-secondary-emphasis">${label}</div>
+            <div class="stat-value" id="${id}">0</div>
+          </div>`;
+      }
+
+      function getRangeData(range) {
+        const now = new Date();
+        let start = new Date(now);
+        if (range === 'today') {
+          start.setHours(0, 0, 0, 0);
+        } else if (range === 'week') {
+          start.setDate(now.getDate() - 6);
+          start.setHours(0, 0, 0, 0);
+        } else if (range === 'month') {
+          start.setDate(now.getDate() - 29);
+          start.setHours(0, 0, 0, 0);
+        } else {
+          start = sessions[0] ? new Date(sessions[0].date) : new Date(now);
+        }
+        const validDates = new Set();
+        const filtered = sessions.filter((entry) => {
+          const date = new Date(entry.date);
+          const include = date >= start && date <= now;
+          if (include) validDates.add(entry.date);
+          return include;
+        });
+        const totals = filtered.reduce((acc, entry) => {
+          acc.pomodoros += entry.pomodoros;
+          acc.focusMinutes += entry.focusMinutes;
+          acc.tasksCompleted += entry.tasksCompleted;
+          return acc;
+        }, { pomodoros: 0, focusMinutes: 0, tasksCompleted: 0 });
+        return {
+          ...totals,
+          activeDays: filtered.filter((entry) => entry.pomodoros > 0).length,
+          rangeDays: Math.max(1, Math.ceil((now - start) / 86400000) + 1),
+          filtered,
+          validDates
+        };
+      }
+
+      function productivityScore(range) {
+        return Math.max(0, Math.min(100, Math.round(((range.focusMinutes / (Math.max(range.rangeDays, 1) * 120)) * 70) + ((range.activeDays / Math.max(range.rangeDays, 1)) * 30))));
+      }
+
+      function computeStreak() {
+        let streak = 0;
+        const map = new Map(sessions.map((entry) => [entry.date, entry]));
+        for (let offset = 0; offset < 365; offset += 1) {
+          const date = new Date();
+          date.setDate(date.getDate() - offset);
+          const key = date.toISOString().split('T')[0];
+          const session = map.get(key);
+          if (session && session.pomodoros > 0) streak += 1;
+          else break;
+        }
+        return streak;
+      }
+
+      function renderTopTags(range) {
+        const completedTasks = tasks.filter((task) => {
+          if (!task.completedAt) return false;
+          return range.validDates.has(task.completedAt.split('T')[0]);
+        });
+        const counts = {};
+        completedTasks.forEach((task) => task.tags.forEach((tag) => { counts[tag] = (counts[tag] || 0) + 1; }));
+        const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (!entries.length) return `<div class="small text-secondary-emphasis">Complete a few tagged tasks to reveal this breakdown.</div>`;
+        const max = entries[0][1] || 1;
+        return entries.map(([tag, count]) => `
+          <div class="tag-row">
+            <div class="d-flex align-items-center justify-content-between gap-3">
+              <strong>#${escapeHtml(tag)}</strong>
+              <span>${count}</span>
+            </div>
+            <div class="tag-bar"><span style="width:${(count / max) * 100}%"></span></div>
+          </div>`).join('');
+      }
+
+      function renderStats() {
+        const view = document.getElementById('view-stats');
+        const range = getRangeData(state.statsRange);
+        const score = productivityScore(range);
+        view.innerHTML = `
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Analytics</h2>
+              <p class="page-subtitle">See your attention patterns, streak intensity, and where work is actually getting finished.</p>
+            </div>
+          </div>
+          <div class="filter-row mb-3" role="tablist" aria-label="Date range filters">
+            ${[['today', 'Today'], ['week', 'This Week'], ['month', 'This Month'], ['all', 'All Time']].map(([key, label]) => `
+              <button class="chip ${state.statsRange === key ? 'active' : ''}" data-stats-range="${key}" role="tab" aria-selected="${state.statsRange === key}">${label}</button>
+            `).join('')}
+          </div>
+          <div class="stats-grid">
+            ${renderStatCard('local_pizza', 'Pomodoros', range.pomodoros, 'count-pomodoros')}
+            ${renderStatCard('schedule', 'Focus Hours', +(range.focusMinutes / 60).toFixed(1), 'count-hours')}
+            ${renderStatCard('task_alt', 'Tasks Done', range.tasksCompleted, 'count-tasks')}
+            ${renderStatCard('local_fire_department', 'Day Streak', computeStreak(), 'count-streak')}
+          </div>
+          <div class="stats-layout">
+            <div class="glass-card chart-card">
+              <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <div>
+                  <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">bar_chart</span>Focus Time</h3>
+                  <p class="section-subtitle">A 7-day rolling view of focused minutes.</p>
+                </div>
+                <span class="meta-chip">${range.focusMinutes} total minutes</span>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="focus-chart" aria-label="Focus time chart"></canvas>
+                <div class="chart-tooltip" id="chart-tooltip"></div>
+              </div>
+            </div>
+            <div class="glass-card score-card">
+              <div class="score-layout">
+                <div class="score-ring">
+                  <svg viewBox="0 0 200 200" aria-hidden="true">
+                    <circle cx="100" cy="100" r="82" stroke="color-mix(in srgb, var(--md-outline) 24%, transparent)" stroke-width="18" fill="none"></circle>
+                    <circle id="score-ring-progress" cx="100" cy="100" r="82" stroke="var(--md-primary)" stroke-width="18" fill="none" stroke-linecap="round" transform="rotate(-90 100 100)"></circle>
+                  </svg>
+                  <div class="score-center">
+                    <strong id="score-value">${score}</strong>
+                    <span>Score</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">track_changes</span>Productivity Score</h3>
+                  <p class="section-subtitle">Weighted by focus minutes and active days across the selected range.</p>
+                  <div class="chips-row">
+                    <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">today</span>${range.activeDays} active days</span>
+                    <span class="meta-chip"><span class="material-icons-round" aria-hidden="true">self_improvement</span>${Math.max(range.rangeDays, 1)} day window</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="glass-card heatmap-card">
+              <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">calendar_month</span>Streak Heatmap</h3>
+              <p class="section-subtitle">The last 70 days of effort, colored by session intensity.</p>
+              <div class="heatmap-grid" id="heatmap-grid"></div>
+              <div class="heatmap-legend">
+                <span>Less</span>
+                ${['var(--md-surface-variant)', '#D0BCFF', '#9A82DB', '#6750A4', '#381E72'].map((color) => `<span class="legend-box" style="background:${color};"></span>`).join('')}
+                <span>More</span>
+              </div>
+              <div class="heatmap-tooltip" id="heatmap-tooltip"></div>
+            </div>
+            <div class="glass-card tag-card">
+              <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">sell</span>Top Tags</h3>
+              <p class="section-subtitle">Which themes show up most often in completed work for this range.</p>
+              <div class="tag-list">${renderTopTags(range)}</div>
+            </div>
+          </div>`;
+        uiState.chartCanvas = document.getElementById('focus-chart');
+        uiState.chartTooltip = document.getElementById('chart-tooltip');
+        uiState.heatmapTooltip = document.getElementById('heatmap-tooltip');
+        drawFocusChart();
+        renderHeatmap();
+        animateStatCards(range, score);
+      }
+
+      function renderNumberField(label, key, value) {
+        return `
+          <div class="md-field has-value">
+            <label for="setting-${key}">${label}</label>
+            <input type="number" min="1" id="setting-${key}" data-duration-input="${key}" value="${value}" aria-label="${label}">
+          </div>`;
+      }
+
+      function renderSettings() {
+        const view = document.getElementById('view-settings');
+        view.innerHTML = `
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Settings</h2>
+              <p class="page-subtitle">Shape the cadence, atmosphere, and visual system around the way you like to work.</p>
+            </div>
+          </div>
+          <div class="settings-layout">
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">timer</span>Timer Durations</h3>
+                <p class="section-subtitle">Adjust each session type and long-break frequency.</p>
+              </div>
+              <div class="settings-grid">
+                ${renderNumberField('Focus Minutes', 'focus', settings.durations.focus)}
+                ${renderNumberField('Short Break', 'shortBreak', settings.durations.shortBreak)}
+                ${renderNumberField('Long Break', 'longBreak', settings.durations.longBreak)}
+                ${renderNumberField('Cycles', 'cyclesBeforeLong', settings.durations.cyclesBeforeLong)}
+              </div>
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">contrast</span>Theme</h3>
+                <p class="section-subtitle">Choose light, dark, or follow your system.</p>
+              </div>
+              <div class="segmented-row">
+                ${['light', 'dark', 'system'].map((option) => `<button class="segmented-btn ${settings.theme === option ? 'active' : ''}" data-theme-option="${option}">${capitalize(option)}</button>`).join('')}
+              </div>
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">notifications</span>Notifications</h3>
+                <p class="section-subtitle">Control browser prompts, completion sounds, and automatic breaks.</p>
+              </div>
+              ${renderToggleRow('Browser notifications', 'Ask permission only when enabling.', 'browser', settings.notifications.browser)}
+              ${renderToggleRow('Sound alerts', 'Play the completion beep.', 'sound', settings.notifications.sound)}
+              ${renderToggleRow('Auto-start breaks', 'Immediately start break sessions after focus.', 'autoStartBreaks', settings.notifications.autoStartBreaks)}
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">volume_up</span>Ambient Sounds</h3>
+                <p class="section-subtitle">Scale every procedural sound source with one master fader.</p>
+              </div>
+              <input type="range" min="0" max="1" step="0.01" value="${settings.audio.masterVolume}" id="master-volume" aria-label="Master volume">
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">palette</span>Accent Color</h3>
+                <p class="section-subtitle">Swap the primary energy of the interface.</p>
+              </div>
+              <div class="accent-row">
+                ${ACCENT_COLORS.map((color) => `<button class="accent-swatch ${settings.accentColor === color ? 'active' : ''}" data-accent-color="${color}" style="background:${color};" aria-label="Accent color ${color}"></button>`).join('')}
+              </div>
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">database</span>Data</h3>
+                <p class="section-subtitle">Export your local records or clear them while keeping your preferences.</p>
+              </div>
+              <div class="chips-row">
+                <button class="chip active" id="export-json-btn">Export JSON</button>
+                <button class="chip" id="reset-data-btn">Reset All Data</button>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div>
+                <h3 class="section-title"><span class="material-icons-round" aria-hidden="true">info</span>About</h3>
+                <p class="section-subtitle">FocusFlow v${settings.version}</p>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <div class="fw-semibold">Repository</div>
+                  <div class="small text-secondary-emphasis">Temporary placeholder link for this prototype.</div>
+                </div>
+                <a class="chip active" href="https://github.com/" target="_blank" rel="noreferrer">Open GitHub</a>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      function renderToggleRow(title, subtitle, key, active) {
+        return `
+          <div class="setting-row">
+            <div>
+              <div class="fw-semibold">${title}</div>
+              <div class="small text-secondary-emphasis">${subtitle}</div>
+            </div>
+            <button class="switch ${active ? 'active' : ''}" data-setting-toggle="${key}" aria-label="${title}"></button>
+          </div>`;
+      }
+
+      function renderAll() {
+        document.getElementById('app').classList.toggle('desktop', window.innerWidth >= 900);
+        renderNav();
+        renderTimer();
+        renderTasks();
+        renderStats();
+        renderSettings();
+        bindInteractiveElements();
+        updateViewVisibility();
+      }
+
+      function updateViewVisibility() {
+        document.querySelectorAll('.view').forEach((view) => view.classList.toggle('active', view.dataset.view === state.selectedView));
+        document.getElementById('tasks-fab').classList.toggle('hidden', state.selectedView !== 'tasks');
+      }
+
+      function bindInteractiveElements() {
+        document.querySelectorAll('[data-view-target]').forEach((button) => button.onclick = () => setView(button.dataset.viewTarget));
+        document.getElementById('sidebar-theme-toggle').onclick = cycleTheme;
+        document.getElementById('tasks-fab').onclick = () => openTaskModal();
+        document.getElementById('add-task-desktop')?.addEventListener('click', () => openTaskModal());
+        document.getElementById('task-search')?.addEventListener('input', (event) => {
+          state.taskSearch = event.target.value;
+          saveState();
+          renderTasks();
+          bindInteractiveElements();
+        });
+        document.querySelectorAll('[data-task-filter]').forEach((chip) => chip.onclick = () => {
+          state.taskFilter = chip.dataset.taskFilter;
+          saveState();
+          renderTasks();
+          bindInteractiveElements();
+        });
+        document.querySelectorAll('[data-stats-range]').forEach((chip) => chip.onclick = () => {
+          state.statsRange = chip.dataset.statsRange;
+          saveState();
+          renderStats();
+          bindInteractiveElements();
+        });
+        document.querySelectorAll('[data-session-tab]').forEach((button) => button.onclick = () => {
+          pauseTimer();
+          state.currentSession = button.dataset.sessionTab;
+          state.remainingSeconds = sessionSeconds(state.currentSession);
+          saveState();
+          renderTimer();
+          bindInteractiveElements();
+        });
+        document.getElementById('play-pause-btn')?.addEventListener('click', () => state.isRunning ? pauseTimer() : startTimer());
+        document.getElementById('reset-btn')?.addEventListener('click', resetTimer);
+        document.getElementById('skip-btn')?.addEventListener('click', skipSession);
+        document.querySelectorAll('[data-task-complete]').forEach((button) => button.onclick = () => completeTask(button.dataset.taskComplete));
+        document.querySelectorAll('[data-task-menu]').forEach((button) => button.onclick = () => openTaskMenu(button.dataset.taskMenu));
+        document.querySelectorAll('[data-duration-input]').forEach((input) => input.addEventListener('change', (event) => {
+          const key = event.target.dataset.durationInput;
+          settings.durations[key] = Math.max(1, Number(event.target.value) || 1);
+          if (key === 'cyclesBeforeLong') settings.durations[key] = Math.min(12, settings.durations[key]);
+          if (state.currentSession === key || (state.currentSession === 'focus' && key === 'focus') || (state.currentSession === 'shortBreak' && key === 'shortBreak') || (state.currentSession === 'longBreak' && key === 'longBreak')) {
+            state.remainingSeconds = sessionSeconds(state.currentSession);
+          }
+          saveSettings();
+          saveState();
+          renderTimer();
+          renderSettings();
+          bindInteractiveElements();
+        }));
+        document.querySelectorAll('[data-theme-option]').forEach((button) => button.onclick = () => {
+          settings.theme = button.dataset.themeOption;
+          saveSettings();
+          applyTheme(true);
+          renderSettings();
+          bindInteractiveElements();
+        });
+        document.querySelectorAll('[data-setting-toggle]').forEach((button) => button.onclick = async () => {
+          const key = button.dataset.settingToggle;
+          if (key === 'browser' && !settings.notifications.browser && 'Notification' in window) {
+            const permission = await Notification.requestPermission();
+            settings.notifications.browser = permission === 'granted';
+          } else {
+            settings.notifications[key] = !settings.notifications[key];
+          }
+          saveSettings();
+          renderSettings();
+          bindInteractiveElements();
+        });
+        document.getElementById('master-volume')?.addEventListener('input', (event) => {
+          settings.audio.masterVolume = Number(event.target.value);
+          updateSoundVolumes();
+          saveSettings();
+        });
+        document.querySelectorAll('[data-accent-color]').forEach((button) => button.onclick = () => {
+          settings.accentColor = button.dataset.accentColor;
+          saveSettings();
+          applyTheme(true);
+          renderAll();
+        });
+        document.getElementById('export-json-btn')?.addEventListener('click', exportData);
+        document.getElementById('reset-data-btn')?.addEventListener('click', resetData);
+        document.querySelectorAll('[data-sound-toggle]').forEach((button) => button.onclick = async () => {
+          await ensureAudio();
+          const key = button.dataset.soundToggle;
+          state.soundStates[key].enabled = !state.soundStates[key].enabled;
+          if (state.soundStates[key].enabled) audioEngine.start(key);
+          else audioEngine.stop(key);
+          saveState();
+          renderTimer();
+          bindInteractiveElements();
+        });
+        document.querySelectorAll('[data-sound-slider]').forEach((input) => input.addEventListener('input', async (event) => {
+          state.soundStates[event.target.dataset.soundSlider].volume = Number(event.target.value);
+          await ensureAudio();
+          updateSoundVolumes();
+          saveState();
+        }));
+        bindRippleEffects();
+        bindFabMagnet();
+      }
+
+      function setView(viewId) {
+        if (state.selectedView === viewId) return;
+        if (REDUCED_MOTION) {
+          state.selectedView = viewId;
+          saveState();
+          renderAll();
+          return;
+        }
+        const curtain = document.getElementById('curtain');
+        gsap.set(curtain, { opacity: 1, clipPath: 'circle(0% at 50% 100%)' });
+        gsap.timeline()
+          .to(curtain, {
+            clipPath: 'circle(150% at 50% 100%)',
+            duration: 0.6,
+            ease: 'power4.inOut',
+            onComplete: () => {
+              state.selectedView = viewId;
+              saveState();
+              renderAll();
+            }
+          })
+          .to(curtain, { clipPath: 'circle(0% at 50% 100%)', duration: 0.55, ease: 'power4.inOut' })
+          .set(curtain, { opacity: 0 });
+      }
+
+      function moveBottomIndicator() {
+        const active = document.querySelector('.bottom-nav-item.active');
+        const indicator = document.getElementById('bottom-nav-indicator');
+        if (!active || !indicator) return;
+        const parentRect = active.parentElement.getBoundingClientRect();
+        const rect = active.getBoundingClientRect();
+        const x = rect.left - parentRect.left + (rect.width - indicator.offsetWidth) / 2;
+        if (REDUCED_MOTION) indicator.style.transform = `translateX(${x}px)`;
+        else gsap.to(indicator, { x, duration: 0.45, ease: 'power3.out' });
+      }
+
+      function startTimer() {
+        clearTimeout(uiState.autoAdvanceTimeout);
+        state.isRunning = true;
+        saveState();
+        renderTimer();
+        bindInteractiveElements();
+        clearInterval(uiState.timerInterval);
+        uiState.timerInterval = setInterval(() => {
+          state.remainingSeconds -= 1;
+          if (state.remainingSeconds <= 0) {
+            clearInterval(uiState.timerInterval);
+            uiState.timerInterval = null;
+            completeSession();
+            return;
+          }
+          updateTimerDisplayOnly();
+          saveState();
+        }, 1000);
+      }
+
+      function pauseTimer() {
+        state.isRunning = false;
+        clearInterval(uiState.timerInterval);
+        uiState.timerInterval = null;
+        saveState();
+        renderTimer();
+        bindInteractiveElements();
+      }
+
+      function resetTimer() {
+        pauseTimer();
+        state.remainingSeconds = sessionSeconds(state.currentSession);
+        saveState();
+        renderTimer();
+        bindInteractiveElements();
+      }
+
+      function getNextSessionType() {
+        if (state.currentSession === 'focus') {
+          return (state.pomodoroCount % settings.durations.cyclesBeforeLong === 0) ? 'longBreak' : 'shortBreak';
+        }
+        return 'focus';
+      }
+
+      function advanceSession(autoStart) {
+        const next = getNextSessionType();
+        state.currentSession = next;
+        state.remainingSeconds = sessionSeconds(next);
+        const shouldRun = next === 'focus' ? autoStart : autoStart && settings.notifications.autoStartBreaks;
+        state.isRunning = false;
+        saveState();
+        renderAll();
+        if (shouldRun) startTimer();
+      }
+
+      function skipSession() {
+        pauseTimer();
+        advanceSession(false);
+      }
+
+      function completeSession() {
+        pauseTimer();
+        const justCompleted = state.currentSession;
+        if (justCompleted === 'focus') {
+          state.pomodoroCount += 1;
+          const record = getSessionRecord(todayKey());
+          record.pomodoros += 1;
+          record.focusMinutes += settings.durations.focus;
+          const activeTask = getActiveTask();
+          if (activeTask) activeTask.pomodorosUsed += 1;
+          saveTasks();
+          saveSessions();
+        }
+        state.remainingSeconds = 0;
+        announce(`${sessionLabel(justCompleted)} session complete.`);
+        particleBurst();
+        showToast('Session complete', 'Your next block is lining up now.', 'success');
+        maybeNotify(`${sessionLabel(justCompleted)} complete`, 'Nice work. Your next session begins in 3 seconds.');
+        if (settings.notifications.sound) beep();
+        sortSessions();
+        uiState.autoAdvanceTimeout = setTimeout(() => advanceSession(true), 3000);
+        renderAll();
+      }
+
+      function updateTimerDisplayOnly() {
+        const count = document.getElementById('timer-count');
+        const ring = document.getElementById('timer-ring');
+        if (!count || !ring) return;
+        const radius = 126;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference * (1 - Math.max(0, state.remainingSeconds) / sessionSeconds(state.currentSession));
+        count.textContent = formatTime(Math.max(0, state.remainingSeconds));
+        if (REDUCED_MOTION) ring.style.strokeDashoffset = offset;
+        else gsap.to(ring, { strokeDashoffset: offset, duration: 0.6, ease: 'none' });
+      }
+
+      function syncTimerRingGlow() {
+        if (uiState.glowTimeline) uiState.glowTimeline.kill();
+        const ring = document.getElementById('timer-ring');
+        if (!ring || state.currentSession !== 'focus' || REDUCED_MOTION) return;
+        uiState.glowTimeline = gsap.timeline({ repeat: -1, yoyo: true }).to(ring, {
+          filter: 'drop-shadow(0 0 24px var(--md-primary)) drop-shadow(0 0 48px var(--md-primary))',
+          duration: 2,
+          ease: 'sine.inOut'
+        });
+      }
+
+      function animateQuote() {
+        const quoteBox = document.getElementById('quote-box');
+        if (!quoteBox || REDUCED_MOTION) return;
+        const quote = QUOTES[state.pomodoroCount % QUOTES.length];
+        quoteBox.innerHTML = `${quote.split(' ').map((word) => `<span class="quote-word d-inline-block me-1">${escapeHtml(word)}</span>`).join('')}<span class="quote-author">FocusFlow motivation engine</span>`;
+        gsap.from(quoteBox.querySelectorAll('.quote-word'), {
+          y: 40,
+          opacity: 0,
+          rotateZ: () => gsap.utils.random(-8, 8),
+          duration: 0.5,
+          stagger: 0.06,
+          ease: 'back.out(2)'
+        });
+      }
+
+      function particleBurst() {
+        const layer = document.getElementById('particle-layer');
+        if (!layer || REDUCED_MOTION) return;
+        const colors = ['var(--md-primary)', 'var(--md-secondary)', '#f6c453', '#ff7f50'];
+        Array.from({ length: 40 }, () => {
+          const particle = document.createElement('span');
+          particle.className = 'particle';
+          particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+          const size = `${gsap.utils.random(4, 12)}px`;
+          particle.style.width = size;
+          particle.style.height = size;
+          layer.appendChild(particle);
+          const angle = gsap.utils.random(0, Math.PI * 2);
+          const distance = gsap.utils.random(80, 200);
+          gsap.fromTo(particle, { x: 0, y: 0, opacity: 1, scale: 1 }, {
+            x: Math.cos(angle) * distance,
+            y: Math.sin(angle) * distance,
+            opacity: 0,
+            scale: 0,
+            duration: 1,
+            ease: 'expo.out',
+            delay: gsap.utils.random(0, 0.1),
+            onComplete: () => particle.remove()
+          });
+        });
+      }
+
+      function completeTask(taskId) {
+        const card = document.querySelector(`[data-task-id="${taskId}"]`);
+        const task = tasks.find((entry) => entry.id === taskId);
+        if (!task) return;
+        task.completedAt = new Date().toISOString();
+        if (state.activeTaskId === task.id) state.activeTaskId = null;
+        getSessionRecord(todayKey()).tasksCompleted += 1;
+        saveTasks();
+        saveSessions();
+        saveState();
+        if (card && !REDUCED_MOTION) {
+          gsap.to(card.querySelector('.task-strike'), { scaleX: 1, duration: 0.35, ease: 'power2.out' });
+          gsap.to(card, { x: 60, opacity: 0, duration: 0.45, ease: 'power2.in', onComplete: () => renderAll() });
+        } else {
+          renderAll();
+        }
+        showToast('Task crushed!', 'Another block finished cleanly.', 'success');
+      }
+
+      function deleteTask(taskId) {
+        tasks = tasks.filter((task) => task.id !== taskId);
+        if (state.activeTaskId === taskId) state.activeTaskId = null;
+        saveTasks();
+        saveState();
+        renderAll();
+      }
+
+      function setActiveTask(taskId) {
+        state.activeTaskId = taskId;
+        saveState();
+        renderAll();
+        showToast('Active task updated', 'Timer progress will now attach to this task.', 'success');
+      }
+
+      async function openTaskMenu(taskId) {
+        const task = tasks.find((entry) => entry.id === taskId);
+        if (!task) return;
+        const result = await Swal.fire({
+          title: task.title,
+          customClass: { popup: 'md-popup' },
+          background: 'var(--md-surface)',
+          color: 'var(--md-on-surface)',
+          showCancelButton: true,
+          showDenyButton: true,
+          confirmButtonText: 'Edit',
+          denyButtonText: 'Set Active',
+          cancelButtonText: 'Delete',
+          reverseButtons: true
+        });
+        if (result.isConfirmed) openTaskModal(task);
+        else if (result.isDenied) setActiveTask(taskId);
+        else if (result.dismiss === Swal.DismissReason.cancel) {
+          const confirmDelete = await Swal.fire({
+            title: 'Delete task?',
+            text: 'This will permanently remove the task from local storage.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            customClass: { popup: 'md-popup' },
+            background: 'var(--md-surface)',
+            color: 'var(--md-on-surface)'
+          });
+          if (confirmDelete.isConfirmed) deleteTask(taskId);
+        }
+      }
+
+      async function openTaskModal(task = null) {
+        const draft = task ? JSON.parse(JSON.stringify(task)) : {
+          id: randomId(),
+          title: '',
+          description: '',
+          priority: 'medium',
+          tags: [],
+          dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+          subtasks: [],
+          completedAt: null,
+          pomodorosEstimated: 2,
+          pomodorosUsed: 0,
+          createdAt: new Date().toISOString()
+        };
+        const result = await Swal.fire({
+          title: task ? 'Edit Task' : 'Add Task',
+          customClass: { popup: 'md-popup' },
+          width: 760,
+          background: 'var(--md-surface)',
+          color: 'var(--md-on-surface)',
+          showCancelButton: true,
+          confirmButtonText: task ? 'Save changes' : 'Create task',
+          focusConfirm: false,
+          html: `
+            <div class="task-form" id="task-form">
+              <div class="md-field ${draft.title ? 'has-value' : ''}">
+                <label for="swal-task-title">Title</label>
+                <input id="swal-task-title" type="text" value="${escapeAttribute(draft.title)}">
+              </div>
+              <div class="md-field ${draft.description ? 'has-value' : ''}">
+                <label for="swal-task-description">Description</label>
+                <textarea id="swal-task-description" rows="3">${escapeHtml(draft.description)}</textarea>
+              </div>
+              <div>
+                <div class="small text-secondary-emphasis mb-2">Priority</div>
+                <div class="chips-row" id="priority-row">
+                  ${Object.entries(PRIORITY_META).map(([key, meta]) => `<button type="button" class="priority-chip ${draft.priority === key ? 'active' : ''}" data-priority-option="${key}" style="border:1px solid ${meta.color};">${meta.label}</button>`).join('')}
+                </div>
+              </div>
+              <div>
+                <div class="d-flex gap-2 align-items-center">
+                  <div class="md-field flex-grow-1"><label for="swal-tag-input">Add tag</label><input id="swal-tag-input" type="text"></div>
+                  <button type="button" class="chip active" id="add-tag-btn">Add</button>
+                </div>
+                <div class="tags-builder mt-2" id="tags-builder"></div>
+              </div>
+              <div class="md-field has-value"><label for="swal-task-date">Due date</label><input id="swal-task-date" type="date" value="${escapeAttribute(String(draft.dueDate).split('T')[0])}"></div>
+              <div>
+                <div class="d-flex gap-2 align-items-center">
+                  <div class="md-field flex-grow-1"><label for="swal-subtask-input">Add subtask</label><input id="swal-subtask-input" type="text"></div>
+                  <button type="button" class="chip active" id="add-subtask-btn">Add</button>
+                </div>
+                <div class="subtask-list mt-2" id="subtask-list"></div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <div><div class="small text-secondary-emphasis">Estimated pomodoros</div></div>
+                <div class="stepper">
+                  <button type="button" id="step-down"><span class="material-icons-round" aria-hidden="true">remove</span></button>
+                  <strong id="stepper-value">${draft.pomodorosEstimated}</strong>
+                  <button type="button" id="step-up"><span class="material-icons-round" aria-hidden="true">add</span></button>
+                </div>
+              </div>
+            </div>`,
+          didOpen: () => setupTaskModalInteractions(draft),
+          preConfirm: () => collectTaskModalData(draft)
+        });
+        if (result.isConfirmed && result.value) {
+          const payload = result.value;
+          if (task) tasks = tasks.map((entry) => entry.id === task.id ? payload : entry);
+          else tasks.unshift(payload);
+          saveTasks();
+          renderAll();
+          showToast(task ? 'Task updated' : 'Task added', task ? 'Changes saved to your board.' : 'Fresh work added to the queue.', 'success');
+        }
+      }
+
+      function setupTaskModalInteractions(draft) {
+        const tagsBuilder = document.getElementById('tags-builder');
+        const subtaskList = document.getElementById('subtask-list');
+        const stepperValue = document.getElementById('stepper-value');
+        function syncChips() {
+          tagsBuilder.innerHTML = draft.tags.map((tag) => `<span class="removable-chip">#${escapeHtml(tag)}<button type="button" data-remove-tag="${escapeAttribute(tag)}"><span class="material-icons-round" aria-hidden="true">close</span></button></span>`).join('');
+          subtaskList.innerHTML = draft.subtasks.map((subtask) => `<span class="removable-chip">${escapeHtml(subtask.text)}<button type="button" data-remove-subtask="${subtask.id}"><span class="material-icons-round" aria-hidden="true">close</span></button></span>`).join('');
+          document.querySelectorAll('[data-remove-tag]').forEach((button) => button.onclick = () => {
+            draft.tags = draft.tags.filter((tag) => tag !== button.dataset.removeTag);
+            syncChips();
+          });
+          document.querySelectorAll('[data-remove-subtask]').forEach((button) => button.onclick = () => {
+            draft.subtasks = draft.subtasks.filter((subtask) => subtask.id !== button.dataset.removeSubtask);
+            syncChips();
+          });
+        }
+        syncChips();
+        document.querySelectorAll('#task-form .md-field input, #task-form .md-field textarea').forEach((field) => field.addEventListener('input', () => {
+          field.parentElement.classList.toggle('has-value', Boolean(field.value));
+        }));
+        document.querySelectorAll('[data-priority-option]').forEach((button) => button.onclick = () => {
+          draft.priority = button.dataset.priorityOption;
+          document.querySelectorAll('[data-priority-option]').forEach((item) => item.classList.toggle('active', item === button));
+        });
+        document.getElementById('add-tag-btn').onclick = () => {
+          const input = document.getElementById('swal-tag-input');
+          const value = input.value.trim().toLowerCase().replace(/\s+/g, '-');
+          if (value && !draft.tags.includes(value)) draft.tags.push(value);
+          input.value = '';
+          input.parentElement.classList.remove('has-value');
+          syncChips();
+        };
+        document.getElementById('add-subtask-btn').onclick = () => {
+          const input = document.getElementById('swal-subtask-input');
+          const value = input.value.trim();
+          if (value) draft.subtasks.push({ id: randomId(), text: value, done: false });
+          input.value = '';
+          input.parentElement.classList.remove('has-value');
+          syncChips();
+        };
+        document.getElementById('step-down').onclick = () => { draft.pomodorosEstimated = Math.max(1, draft.pomodorosEstimated - 1); stepperValue.textContent = draft.pomodorosEstimated; };
+        document.getElementById('step-up').onclick = () => { draft.pomodorosEstimated = Math.min(12, draft.pomodorosEstimated + 1); stepperValue.textContent = draft.pomodorosEstimated; };
+      }
+
+      function collectTaskModalData(draft) {
+        const title = document.getElementById('swal-task-title').value.trim();
+        if (!title) {
+          Swal.showValidationMessage('Task title is required.');
+          return false;
+        }
+        draft.title = title;
+        draft.description = document.getElementById('swal-task-description').value.trim();
+        draft.dueDate = new Date(document.getElementById('swal-task-date').value || new Date()).toISOString();
+        return draft;
+      }
+
+      function animateStatCards(range, score) {
+        const metrics = [
+          { id: 'count-pomodoros', value: range.pomodoros },
+          { id: 'count-hours', value: +(range.focusMinutes / 60).toFixed(1), decimal: true },
+          { id: 'count-tasks', value: range.tasksCompleted },
+          { id: 'count-streak', value: computeStreak() },
+          { id: 'score-value', value: score }
+        ];
+        metrics.forEach(({ id, value, decimal }) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const proxy = { val: 0 };
+          if (REDUCED_MOTION) {
+            el.textContent = decimal ? value.toFixed(1) : Math.round(value).toLocaleString();
+            return;
+          }
+          gsap.to(proxy, {
+            val: value,
+            duration: 1.8,
+            ease: 'power2.out',
+            onUpdate: () => { el.textContent = decimal ? proxy.val.toFixed(1) : Math.round(proxy.val).toLocaleString(); }
+          });
+        });
+        const ring = document.getElementById('score-ring-progress');
+        if (ring) {
+          const radius = 82;
+          const circumference = 2 * Math.PI * radius;
+          ring.setAttribute('stroke-dasharray', circumference);
+          const offset = circumference * (1 - score / 100);
+          if (REDUCED_MOTION) ring.setAttribute('stroke-dashoffset', offset);
+          else gsap.fromTo(ring, { strokeDashoffset: circumference }, { strokeDashoffset: offset, duration: 1.2, ease: 'power3.out' });
+        }
+      }
+
+      function roundRect(ctx, x, y, width, height, radius) {
+        if (height <= 0) return;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+      }
+
+      function drawFocusChart() {
+        const canvas = uiState.chartCanvas;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * devicePixelRatio;
+        canvas.height = rect.height * devicePixelRatio;
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        const width = rect.width;
+        const height = rect.height;
+        ctx.clearRect(0, 0, width, height);
+        const data = Array.from({ length: 7 }, (_, index) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (6 - index));
+          const key = date.toISOString().split('T')[0];
+          const match = sessions.find((entry) => entry.date === key);
+          return { date: key, minutes: match ? match.focusMinutes : 0 };
+        });
+        const max = Math.max(...data.map((entry) => entry.minutes), 25);
+        const padding = { top: 20, right: 10, bottom: 32, left: 10 };
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        const barWidth = chartWidth / data.length - 12;
+        chartState.bars = data.map((entry, index) => {
+          const x = padding.left + index * (barWidth + 12) + 6;
+          const h = (entry.minutes / max) * chartHeight;
+          return { ...entry, x, y: padding.top + chartHeight - h, width: barWidth, height: h };
+        });
+        const drawBars = (heights) => {
+          ctx.clearRect(0, 0, width, height);
+          chartState.bars.forEach((bar, index) => {
+            const currentHeight = heights[index];
+            const gradient = ctx.createLinearGradient(0, bar.y, 0, padding.top + chartHeight);
+            gradient.addColorStop(0, settings.accentColor);
+            gradient.addColorStop(1, mixColor(settings.accentColor, '#ffffff', 0.55));
+            ctx.fillStyle = gradient;
+            roundRect(ctx, bar.x, padding.top + chartHeight - currentHeight, bar.width, currentHeight, 16);
+            ctx.fill();
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--md-on-surface-variant');
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(new Date(bar.date).toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2), bar.x + bar.width / 2, height - 10);
+          });
+        };
+        if (REDUCED_MOTION) drawBars(chartState.bars.map((bar) => bar.height));
+        else {
+          const proxy = chartState.bars.map(() => 0);
+          chartState.bars.forEach((bar, index) => {
+            gsap.to(proxy, {
+              [index]: bar.height,
+              duration: 0.65,
+              delay: index * 0.06,
+              ease: 'power3.out',
+              onUpdate: () => drawBars(proxy)
+            });
+          });
+        }
+        canvas.onmousemove = handleChartHover;
+        canvas.onmouseleave = () => { uiState.chartTooltip.style.opacity = 0; };
+      }
+
+      function handleChartHover(event) {
+        const canvas = uiState.chartCanvas;
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const hit = chartState.bars.find((bar) => x >= bar.x && x <= bar.x + bar.width && y >= bar.y && y <= bar.y + bar.height);
+        if (!hit) {
+          uiState.chartTooltip.style.opacity = 0;
+          return;
+        }
+        uiState.chartTooltip.style.opacity = 1;
+        uiState.chartTooltip.style.left = `${hit.x + hit.width / 2}px`;
+        uiState.chartTooltip.style.top = `${hit.y}px`;
+        uiState.chartTooltip.innerHTML = `<strong>${hit.minutes} minutes</strong><br>${new Date(hit.date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}`;
+      }
+
+      function renderHeatmap() {
+        const grid = document.getElementById('heatmap-grid');
+        if (!grid) return;
+        const sessionMap = new Map(sessions.map((entry) => [entry.date, entry]));
+        const cells = [];
+        for (let index = 69; index >= 0; index -= 1) {
+          const date = new Date();
+          date.setDate(date.getDate() - index);
+          const key = date.toISOString().split('T')[0];
+          const entry = sessionMap.get(key);
+          const pomodoros = entry ? entry.pomodoros : 0;
+          const color = pomodoros === 0 ? 'var(--md-surface-variant)' : pomodoros <= 2 ? '#D0BCFF' : pomodoros <= 4 ? '#9A82DB' : pomodoros <= 6 ? '#6750A4' : '#381E72';
+          cells.push(`<div class="heatmap-cell" data-heatmap-date="${key}" data-heatmap-pomodoros="${pomodoros}" style="background:${color};"></div>`);
+        }
+        grid.innerHTML = cells.join('');
+        document.querySelectorAll('.heatmap-cell').forEach((cell) => {
+          cell.addEventListener('mouseenter', () => {
+            uiState.heatmapTooltip.style.opacity = 1;
+            uiState.heatmapTooltip.style.left = `${cell.offsetLeft + 12}px`;
+            uiState.heatmapTooltip.style.top = `${cell.offsetTop + 4}px`;
+            uiState.heatmapTooltip.innerHTML = `${cell.dataset.heatmapPomodoros} sessions<br>${new Date(cell.dataset.heatmapDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+            if (!REDUCED_MOTION) gsap.to(cell, { scale: 1.4, duration: 0.2, ease: 'power2.out' });
+          });
+          cell.addEventListener('mouseleave', () => {
+            uiState.heatmapTooltip.style.opacity = 0;
+            if (!REDUCED_MOTION) gsap.to(cell, { scale: 1, duration: 0.2, ease: 'power2.out' });
+          });
+        });
+        if (!REDUCED_MOTION) {
+          gsap.from('.heatmap-cell', {
+            scale: 0,
+            opacity: 0,
+            duration: 0.3,
+            stagger: { amount: 1.2, from: 'start', grid: [10, 7] },
+            ease: 'back.out(2)'
+          });
+        }
+      }
+
+      function showToast(title, text, icon = 'success') { Toast.fire({ title, text, icon }); }
+      function maybeNotify(title, body) {
+        if (settings.notifications.browser && 'Notification' in window && Notification.permission === 'granted') new Notification(title, { body });
+      }
+      function announce(message) {
+        const live = document.getElementById('live-region');
+        if (live) live.textContent = message;
+      }
+      function exportData() {
+        const payload = { exportedAt: new Date().toISOString(), settings, state, tasks, sessions };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `focusflow-export-${todayKey()}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+      async function resetData() {
+        const result = await Swal.fire({
+          title: 'Reset all task and session data?',
+          text: 'Your current settings will be preserved.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Reset data',
+          customClass: { popup: 'md-popup' },
+          background: 'var(--md-surface)',
+          color: 'var(--md-on-surface)'
+        });
+        if (!result.isConfirmed) return;
+        localStorage.removeItem(STORAGE_KEYS.tasks);
+        localStorage.removeItem(STORAGE_KEYS.sessions);
+        localStorage.removeItem(STORAGE_KEYS.state);
+        setStore(STORAGE_KEYS.tasks, []);
+        setStore(STORAGE_KEYS.sessions, []);
+        setStore(STORAGE_KEYS.state, DEFAULT_STATE);
+        loadData();
+        renderAll();
+        showToast('Data reset', 'Tasks, sessions, and runtime state were cleared.', 'success');
+      }
+
+      function bindRippleEffects() {
+        document.querySelectorAll('button').forEach((button) => {
+          if (button.dataset.rippleBound) return;
+          button.dataset.rippleBound = 'true';
+          button.addEventListener('click', (event) => {
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.left = `${event.clientX - rect.left}px`;
+            ripple.style.top = `${event.clientY - rect.top}px`;
+            button.appendChild(ripple);
+            if (REDUCED_MOTION) setTimeout(() => ripple.remove(), 250);
+            else gsap.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 40, opacity: 0, duration: 0.6, ease: 'expo.out', onComplete: () => ripple.remove() });
+          });
+        });
+      }
+
+      function bindFabMagnet() {
+        const fab = document.getElementById('tasks-fab');
+        if (!fab || fab.classList.contains('hidden') || REDUCED_MOTION) return;
+        const xTo = gsap.quickTo(fab, 'x', { duration: 0.4, ease: 'power3' });
+        const yTo = gsap.quickTo(fab, 'y', { duration: 0.4, ease: 'power3' });
+        fab.onmousemove = (event) => {
+          const rect = fab.getBoundingClientRect();
+          const dx = event.clientX - (rect.left + rect.width / 2);
+          const dy = event.clientY - (rect.top + rect.height / 2);
+          if (Math.hypot(dx, dy) < 80) {
+            xTo(dx * 0.3);
+            yTo(dy * 0.3);
+          }
+        };
+        fab.onmouseleave = () => { xTo(0); yTo(0); };
+      }
+
+      function animateThemeWipe() {
+        const wipe = document.getElementById('theme-wipe');
+        const circle = document.getElementById('theme-wipe-circle');
+        gsap.set(wipe, { opacity: 1 });
+        gsap.fromTo(circle, { attr: { cx: -20, cy: 50, r: 18 } }, {
+          duration: 0.85,
+          ease: 'power2.inOut',
+          motionPath: { path: [{ x: -20, y: 50 }, { x: 40, y: 20 }, { x: 110, y: 60 }] },
+          attr: { r: 88 },
+          onComplete: () => gsap.to(wipe, { opacity: 0, duration: 0.2 })
+        });
+      }
+
+      const audioEngine = {
+        ctx: null,
+        master: null,
+        nodes: {},
+        async init() {
+          if (this.ctx) return;
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return;
+          this.ctx = new Ctx();
+          this.master = this.ctx.createGain();
+          this.master.gain.value = settings.audio.masterVolume;
+          this.master.connect(this.ctx.destination);
+          this.nodes = {
+            rain: this.createRain(),
+            ocean: this.createOcean(),
+            cafe: this.createCafe(),
+            forest: this.createForest(),
+            fire: this.createFire()
+          };
+          updateSoundVolumes();
+        },
+        async resume() {
+          if (!this.ctx) await this.init();
+          if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
+        },
+        createNoiseBuffer(duration = 2) {
+          const sampleRate = this.ctx.sampleRate;
+          const buffer = this.ctx.createBuffer(1, sampleRate * duration, sampleRate);
+          const channel = buffer.getChannelData(0);
+          for (let i = 0; i < channel.length; i += 1) channel[i] = Math.random() * 2 - 1;
+          return buffer;
+        },
+        createBrownBuffer(duration = 2) {
+          const sampleRate = this.ctx.sampleRate;
+          const buffer = this.ctx.createBuffer(1, sampleRate * duration, sampleRate);
+          const data = buffer.getChannelData(0);
+          let last = 0;
+          for (let i = 0; i < data.length; i += 1) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (last + (0.02 * white)) / 1.02;
+            last = data[i];
+            data[i] *= 3.5;
+          }
+          return buffer;
+        },
+        makeLoopSource(buffer) {
+          const source = this.ctx.createBufferSource();
+          source.buffer = buffer;
+          source.loop = true;
+          return source;
+        },
+        createRain() {
+          const source = this.makeLoopSource(this.createNoiseBuffer());
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 2800;
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0;
+          source.connect(filter).connect(gain).connect(this.master);
+          let started = false;
+          return { gain, start: () => { if (!started) { source.start(); started = true; } }, stop: () => gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15) };
+        },
+        createOcean() {
+          const source = this.makeLoopSource(this.createNoiseBuffer());
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.value = 700;
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          lfo.frequency.value = 0.18;
+          lfoGain.gain.value = 400;
+          lfo.connect(lfoGain).connect(filter.frequency);
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0;
+          source.connect(filter).connect(gain).connect(this.master);
+          let started = false;
+          return { gain, start: () => { if (!started) { source.start(); lfo.start(); started = true; } }, stop: () => gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15) };
+        },
+        createCafe() {
+          const brown = this.makeLoopSource(this.createBrownBuffer());
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0;
+          brown.connect(gain).connect(this.master);
+          let started = false;
+          let clickTimer = null;
+          return {
+            gain,
+            start: () => {
+              if (!started) { brown.start(); started = true; }
+              clickTimer = setInterval(() => {
+                const osc = this.ctx.createOscillator();
+                const localGain = this.ctx.createGain();
+                osc.frequency.value = 1000 + Math.random() * 600;
+                localGain.gain.value = 0.0001;
+                osc.connect(localGain).connect(this.master);
+                osc.start();
+                localGain.gain.exponentialRampToValueAtTime(0.03, this.ctx.currentTime + 0.01);
+                localGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.05);
+                osc.stop(this.ctx.currentTime + 0.06);
+              }, 2200);
+            },
+            stop: () => { clearInterval(clickTimer); gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15); }
+          };
+        },
+        createForest() {
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0;
+          gain.connect(this.master);
+          let chirpTimer = null;
+          return {
+            gain,
+            start: () => {
+              chirpTimer = setInterval(() => {
+                const osc = this.ctx.createOscillator();
+                const localGain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200 + Math.random() * 1200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.2);
+                localGain.gain.value = 0.0001;
+                osc.connect(localGain).connect(gain);
+                osc.start();
+                localGain.gain.exponentialRampToValueAtTime(0.08, this.ctx.currentTime + 0.02);
+                localGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.22);
+                osc.stop(this.ctx.currentTime + 0.24);
+              }, 1400);
+            },
+            stop: () => { clearInterval(chirpTimer); gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15); }
+          };
+        },
+        createFire() {
+          const source = this.makeLoopSource(this.createNoiseBuffer());
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.value = 500;
+          const tremolo = this.ctx.createOscillator();
+          const tremoloGain = this.ctx.createGain();
+          tremolo.frequency.value = 6;
+          tremoloGain.gain.value = 0.08;
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0;
+          tremolo.connect(tremoloGain).connect(gain.gain);
+          source.connect(filter).connect(gain).connect(this.master);
+          let started = false;
+          return { gain, start: () => { if (!started) { source.start(); tremolo.start(); started = true; } }, stop: () => gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15) };
+        },
+        start(key) { this.nodes[key]?.start(); updateSoundVolumes(); },
+        stop(key) { this.nodes[key]?.stop(); }
+      };
+
+      async function ensureAudio() {
+        try { await audioEngine.resume(); } catch (error) { console.warn('Audio initialization failed', error); }
+      }
+      function updateSoundVolumes() {
+        if (!audioEngine.master || !audioEngine.ctx) return;
+        audioEngine.master.gain.value = settings.audio.masterVolume;
+        SOUND_META.forEach((sound) => {
+          const soundState = state.soundStates[sound.key];
+          const node = audioEngine.nodes[sound.key];
+          if (!node || !node.gain) return;
+          const target = soundState.enabled ? soundState.volume * settings.audio.masterVolume : 0;
+          node.gain.gain.cancelScheduledValues(audioEngine.ctx.currentTime);
+          node.gain.gain.linearRampToValueAtTime(target, audioEngine.ctx.currentTime + 0.15);
+        });
+      }
+      function beep() {
+        ensureAudio().then(() => {
+          if (!audioEngine.ctx) return;
+          const oscillator = audioEngine.ctx.createOscillator();
+          const gain = audioEngine.ctx.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = 880;
+          gain.gain.value = 0.0001;
+          oscillator.connect(gain).connect(audioEngine.master);
+          oscillator.start();
+          gain.gain.exponentialRampToValueAtTime(0.15, audioEngine.ctx.currentTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioEngine.ctx.currentTime + 0.35);
+          oscillator.stop(audioEngine.ctx.currentTime + 0.36);
+        });
+      }
+
+      function attachSwipeHandlers() {
+        document.querySelectorAll('.task-card').forEach((card) => {
+          let startX = 0;
+          let currentX = 0;
+          let touching = false;
+          const inner = card.querySelector('.task-card-inner');
+          card.addEventListener('touchstart', (event) => { touching = true; startX = event.touches[0].clientX; }, { passive: true });
+          card.addEventListener('touchmove', (event) => {
+            if (!touching) return;
+            currentX = event.touches[0].clientX - startX;
+            if (currentX < 0) inner.style.transform = `translateX(${Math.max(currentX, -110)}px)`;
+          }, { passive: true });
+          card.addEventListener('touchend', async () => {
+            touching = false;
+            if (currentX < -90) {
+              const confirm = await Swal.fire({
+                title: 'Delete task?',
+                text: 'Swipe delete will permanently remove it.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                customClass: { popup: 'md-popup' },
+                background: 'var(--md-surface)',
+                color: 'var(--md-on-surface)'
+              });
+              if (confirm.isConfirmed) deleteTask(card.dataset.taskId);
+            }
+            inner.style.transform = 'translateX(0)';
+            currentX = 0;
+          });
+        });
+      }
+
+      function capitalize(value) { return value.charAt(0).toUpperCase() + value.slice(1); }
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+      function escapeAttribute(value) { return escapeHtml(value).replace(/"/g, '&quot;'); }
+
+      function attachGlobalListeners() {
+        window.addEventListener('resize', () => {
+          renderNav();
+          if (state.selectedView === 'stats') drawFocusChart();
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden && state.isRunning) pauseTimer();
+        });
+        document.addEventListener('pointerdown', ensureAudio, { once: true });
+        themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        themeMedia.addEventListener('change', () => { if (settings.theme === 'system') applyTheme(); });
+      }
+
+      function init() {
+        seedIfNeeded();
+        loadData();
+        applyTheme();
+        renderAll();
+        attachGlobalListeners();
+      }
+
+      init();
+
+      window.getStore = getStore;
+      window.setStore = setStore;
+      window.updateStore = updateStore;
+      window.debouncedSave = debouncedSave;
+      window.seedIfNeeded = seedIfNeeded;
+      window.setView = setView;
+      window.startTimer = startTimer;
+      window.pauseTimer = pauseTimer;
+      window.resetTimer = resetTimer;
+      window.skipSession = skipSession;
+      window.completeSession = completeSession;
+      window.openTaskModal = openTaskModal;
+      window.setActiveTask = setActiveTask;
+      window.renderTimer = renderTimer;
+      window.renderTasks = renderTasks;
+      window.renderStats = renderStats;
+      window.renderSettings = renderSettings;
+      window.exportData = exportData;
+      window.resetData = resetData;
+    })();
+  </script>
+</body>
+</html>
