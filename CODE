@@ -1,1 +1,4 @@
-<link rel="stylesheet" href="~/css/styles.css" />
+•	Microsoft.EntityFrameworkCore
+•	Microsoft.EntityFrameworkCore.SqlServer
+•	Microsoft.EntityFrameworkCore.Tools
+
