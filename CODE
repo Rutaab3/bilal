@@ -1,12 +1,2 @@
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=.; Database=ProductAppDb; User Id = sa; Password = aptech; TrustServiceCertificate=True"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*"
-}
+insert into Products values 
+('iphone91', 'not avaiable', 15000 , 'iphone.png')
